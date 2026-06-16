@@ -3,7 +3,7 @@
 > Declare your Palo Alto firewall security baseline as version-controlled data.
 > Enforce it idempotently with Ansible. Detect drift before an auditor does.
 
-[![Lint](https://github.com/durgesh7372/panos-policy-as-code/actions/workflows/lint.yml/badge.svg)](https://github.com/USERNAME/panos-policy-as-code/actions/workflows/lint.yml)
+[![Lint](https://github.com/durgesh7372/panos-policy-as-code/actions/workflows/lint.yml/badge.svg)](https://github.com/durgesh7372/panos-policy-as-code/actions/workflows/lint.yml)
 ![Ansible](https://img.shields.io/badge/ansible-2.15%2B-blue)
 ![PAN--OS](https://img.shields.io/badge/PAN--OS-10.x%20%7C%2011.x-orange)
 
