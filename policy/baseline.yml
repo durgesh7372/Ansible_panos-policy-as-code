@@ -1,0 +1,73 @@
+---
+# ============================================================================
+#  SECURITY BASELINE — single source of truth
+# ============================================================================
+#  This file IS the policy. Edit it, open a PR, get it reviewed, merge, enforce.
+#  No playbook logic should ever need to change to add an object or a rule.
+# ============================================================================
+
+address_objects:
+  - name: corp-subnet
+    value: "10.20.0.0/16"
+    type: ip-netmask
+    description: "Corporate user subnet"
+  - name: web-server
+    value: "10.10.10.20"
+    type: ip-netmask
+    description: "DMZ web server"
+  - name: db-server
+    value: "10.10.10.30"
+    type: ip-netmask
+    description: "Internal database server"
+
+service_objects:
+  - name: tcp-8443
+    protocol: tcp
+    destination_port: "8443"
+    description: "Custom HTTPS management port"
+
+security_rules:
+  - name: allow-corp-to-web
+    source_zone: [trust]
+    destination_zone: [dmz]
+    source_ip: [corp-subnet]
+    destination_ip: [web-server]
+    application: [ssl, web-browsing]
+    service: [application-default]
+    action: allow
+    log_end: true
+    description: "Corp users reach the DMZ web server"
+
+  - name: allow-web-to-db
+    source_zone: [dmz]
+    destination_zone: [trust]
+    source_ip: [web-server]
+    destination_ip: [db-server]
+    application: [mysql]
+    service: [application-default]
+    action: allow
+    log_end: true
+    description: "Web tier reaches DB tier on app-default port"
+
+  - name: deny-and-log-all
+    source_zone: [any]
+    destination_zone: [any]
+    source_ip: [any]
+    destination_ip: [any]
+    application: [any]
+    service: [any]
+    action: deny
+    log_end: true
+    description: "Explicit catch-all deny with logging"
+
+nat_rules:
+  - name: corp-outbound-pat
+    source_zone: [trust]
+    destination_zone: [untrust]
+    source_ip: [corp-subnet]
+    destination_ip: [any]
+    service: any
+    snat_type: dynamic-ip-and-port
+    snat_interface: ethernet1/1
+    snat_address_type: interface-address
+    description: "Source NAT corp users to internet"

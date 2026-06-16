@@ -1,0 +1,70 @@
+---
+# Reusable role that converges a PAN-OS device to the security baseline.
+# Order matters: objects must exist before rules reference them; rules and NAT
+# before the final commit. Each task is idempotent.
+
+- name: Enforce address objects
+  paloaltonetworks.panos.panos_address_object:
+    provider: "{{ panos_provider }}"
+    device_group: "{{ panos_device_group | default(omit, true) }}"
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    address_type: "{{ item.type }}"
+    description: "{{ item.description | default(omit) }}"
+    state: present
+  loop: "{{ address_objects | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Enforce service objects
+  paloaltonetworks.panos.panos_service_object:
+    provider: "{{ panos_provider }}"
+    device_group: "{{ panos_device_group | default(omit, true) }}"
+    name: "{{ item.name }}"
+    protocol: "{{ item.protocol }}"
+    destination_port: "{{ item.destination_port }}"
+    description: "{{ item.description | default(omit) }}"
+    state: present
+  loop: "{{ service_objects | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Enforce security rules
+  paloaltonetworks.panos.panos_security_rule:
+    provider: "{{ panos_provider }}"
+    device_group: "{{ panos_device_group | default(omit, true) }}"
+    rule_name: "{{ item.name }}"
+    source_zone: "{{ item.source_zone }}"
+    destination_zone: "{{ item.destination_zone }}"
+    source_ip: "{{ item.source_ip }}"
+    destination_ip: "{{ item.destination_ip }}"
+    application: "{{ item.application }}"
+    service: "{{ item.service }}"
+    action: "{{ item.action }}"
+    log_end: "{{ item.log_end | default(true) }}"
+    description: "{{ item.description | default(omit) }}"
+    state: present
+  loop: "{{ security_rules | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify: commit candidate config
+
+- name: Enforce NAT rules
+  paloaltonetworks.panos.panos_nat_rule:
+    provider: "{{ panos_provider }}"
+    device_group: "{{ panos_device_group | default(omit, true) }}"
+    rule_name: "{{ item.name }}"
+    source_zone: "{{ item.source_zone }}"
+    destination_zone: "{{ item.destination_zone }}"
+    source_ip: "{{ item.source_ip }}"
+    destination_ip: "{{ item.destination_ip }}"
+    service: "{{ item.service | default('any') }}"
+    snat_type: "{{ item.snat_type }}"
+    snat_interface: "{{ item.snat_interface }}"
+    snat_address_type: "{{ item.snat_address_type | default('interface-address') }}"
+    description: "{{ item.description | default(omit) }}"
+    state: present
+  loop: "{{ nat_rules | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify: commit candidate config

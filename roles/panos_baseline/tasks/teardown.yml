@@ -1,0 +1,46 @@
+---
+# Reverse-order removal: rules/NAT first (they reference objects), then objects.
+
+- name: Remove security rules
+  paloaltonetworks.panos.panos_security_rule:
+    provider: "{{ panos_provider }}"
+    device_group: "{{ panos_device_group | default(omit, true) }}"
+    rule_name: "{{ item.name }}"
+    state: absent
+  loop: "{{ security_rules | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify: commit candidate config
+
+- name: Remove NAT rules
+  paloaltonetworks.panos.panos_nat_rule:
+    provider: "{{ panos_provider }}"
+    device_group: "{{ panos_device_group | default(omit, true) }}"
+    rule_name: "{{ item.name }}"
+    state: absent
+  loop: "{{ nat_rules | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify: commit candidate config
+
+- name: Remove service objects
+  paloaltonetworks.panos.panos_service_object:
+    provider: "{{ panos_provider }}"
+    device_group: "{{ panos_device_group | default(omit, true) }}"
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ service_objects | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify: commit candidate config
+
+- name: Remove address objects
+  paloaltonetworks.panos.panos_address_object:
+    provider: "{{ panos_provider }}"
+    device_group: "{{ panos_device_group | default(omit, true) }}"
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ address_objects | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify: commit candidate config

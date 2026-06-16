@@ -1,0 +1,27 @@
+---
+# Drift detection. This is just the enforce role run in CHECK mode — Ansible
+# reports what WOULD change without applying anything. If every task is "ok",
+# the firewall matches the baseline. Any "changed" task = drift.
+#
+#   ansible-playbook playbooks/drift_report.yml
+#
+# (The check_mode: true below forces read-only even without --check on the CLI,
+#  so this playbook can never modify the device.)
+
+- name: Report drift from PAN-OS security baseline
+  hosts: panos_fw
+  gather_facts: false
+  check_mode: true
+  collections:
+    - paloaltonetworks.panos
+  vars_files:
+    - ../policy/baseline.yml
+  roles:
+    - panos_baseline
+
+  post_tasks:
+    - name: Drift summary
+      ansible.builtin.debug:
+        msg: >-
+          Review the play recap above. changed=0 means the device matches the
+          baseline. Any 'changed' line indicates configuration drift.

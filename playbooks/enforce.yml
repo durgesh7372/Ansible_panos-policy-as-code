@@ -1,0 +1,15 @@
+---
+# Apply the security baseline to the target firewall.
+#
+#   Dry run (read-only):  ansible-playbook playbooks/enforce.yml --check --diff
+#   Enforce:              ansible-playbook playbooks/enforce.yml
+
+- name: Enforce PAN-OS security baseline
+  hosts: panos_fw
+  gather_facts: false
+  collections:
+    - paloaltonetworks.panos
+  vars_files:
+    - ../policy/baseline.yml
+  roles:
+    - panos_baseline

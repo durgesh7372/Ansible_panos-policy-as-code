@@ -1,0 +1,17 @@
+---
+# Cleanly remove everything the baseline defines. Useful for resetting a lab.
+#
+#   ansible-playbook playbooks/teardown.yml
+
+- name: Tear down PAN-OS security baseline
+  hosts: panos_fw
+  gather_facts: false
+  collections:
+    - paloaltonetworks.panos
+  vars_files:
+    - ../policy/baseline.yml
+  tasks:
+    - name: Run role teardown tasks
+      ansible.builtin.include_role:
+        name: panos_baseline
+        tasks_from: teardown.yml

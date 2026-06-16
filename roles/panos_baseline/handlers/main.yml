@@ -1,0 +1,8 @@
+---
+# Handlers run once at the end, and only if a task notified them. This is the
+# idiomatic way to commit: no changes => no commit => no needless job on the box.
+
+- name: commit candidate config
+  paloaltonetworks.panos.panos_commit_firewall:
+    provider: "{{ panos_provider }}"
+  listen: commit candidate config

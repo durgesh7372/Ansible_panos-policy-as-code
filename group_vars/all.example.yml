@@ -1,0 +1,10 @@
+---
+# Copy to all.yml (git-ignored) and fill in. Encrypt real creds with ansible-vault.
+panos_provider:
+  ip_address: "192.0.2.10"
+  username: "admin"
+  password: "CHANGE_ME"
+  # api_key: "..."        # optional, instead of username/password
+
+# Set when driving a Panorama instead of a standalone NGFW; empty = standalone.
+panos_device_group: ""

@@ -1,0 +1,12 @@
+# Never commit real credentials
+group_vars/all.yml
+*.vault
+.vault_pass*
+
+# Python / venv
+.venv/
+__pycache__/
+*.pyc
+
+# Ansible
+*.retry

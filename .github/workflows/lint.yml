@@ -1,0 +1,16 @@
+name: Lint
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install linters
+        run: pip install ansible-lint yamllint
+      - name: yamllint
+        run: yamllint .
+      - name: ansible-lint
+        run: ansible-lint || true   # advisory on a lab repo; remove '|| true' to enforce
